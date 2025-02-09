@@ -46,7 +46,22 @@ void sei_free(sei_t* s)
 {
     switch( s->payloadType ) {
         case SEI_TYPE_SCALABILITY_INFO:
-            if ( s->sei_svc != NULL ) free(s->sei_svc);
+            if ( s->sei_svc != NULL ) {
+                free(s->sei_svc);
+            }
+            break;
+        case SEI_TYPE_DISPLAY_ORIENTATION:
+            if ( s->sei_do != NULL ) {
+                free(s->sei_do);
+            }
+            break;
+        case SEI_TYPE_USER_DATA_UNREGISTERED:
+            if ( s->sei_uud != NULL ) {
+                if ( s->sei_uud->user_data != NULL ) {
+                    free(s->sei_uud->user_data);
+                }
+                free(s->sei_uud);
+            }
             break;
         default:
             if ( s->data != NULL ) free(s->data);
@@ -273,11 +288,15 @@ void read_sei_unregistered_user_data( h264_stream_t* h, bs_t* b )
 {
     sei_unregistered_user_data_t* sei_uud = h->sei->sei_uud;
 
-    for( int i = 0; i <= 16; i++ )
+    for( int i = 0; i < 16; i++ )
     {
         sei_uud->uuid[i] = bs_read_u8(b);
     }
-    for( int i = 0; i <= h->sei->payloadSize - 16; i++ )
+    if( 1 )
+    {
+        sei_uud->user_data = (uint8_t*)calloc(h->sei->payloadSize - 16, sizeof(uint8_t));
+    }
+    for( int i = 0; i < h->sei->payloadSize - 16; i++ )
     {
         sei_uud->user_data[i] = bs_read_u8(b);
     }
@@ -532,11 +551,15 @@ void write_sei_unregistered_user_data( h264_stream_t* h, bs_t* b )
 {
     sei_unregistered_user_data_t* sei_uud = h->sei->sei_uud;
 
-    for( int i = 0; i <= 16; i++ )
+    for( int i = 0; i < 16; i++ )
     {
         bs_write_u8(b, sei_uud->uuid[i]);
     }
-    for( int i = 0; i <= h->sei->payloadSize - 16; i++ )
+    if( 0 )
+    {
+        sei_uud->user_data = (uint8_t*)calloc(h->sei->payloadSize - 16, sizeof(uint8_t));
+    }
+    for( int i = 0; i < h->sei->payloadSize - 16; i++ )
     {
         bs_write_u8(b, sei_uud->user_data[i]);
     }
@@ -791,11 +814,15 @@ void read_debug_sei_unregistered_user_data( h264_stream_t* h, bs_t* b )
 {
     sei_unregistered_user_data_t* sei_uud = h->sei->sei_uud;
 
-    for( int i = 0; i <= 16; i++ )
+    for( int i = 0; i < 16; i++ )
     {
         printf("%ld.%d: ", (long int)(b->p - b->start), b->bits_left); sei_uud->uuid[i] = bs_read_u8(b); printf("sei_uud->uuid[i]: %d \n", sei_uud->uuid[i]); 
     }
-    for( int i = 0; i <= h->sei->payloadSize - 16; i++ )
+    if( 1 )
+    {
+        sei_uud->user_data = (uint8_t*)calloc(h->sei->payloadSize - 16, sizeof(uint8_t));
+    }
+    for( int i = 0; i < h->sei->payloadSize - 16; i++ )
     {
         printf("%ld.%d: ", (long int)(b->p - b->start), b->bits_left); sei_uud->user_data[i] = bs_read_u8(b); printf("sei_uud->user_data[i]: %d \n", sei_uud->user_data[i]); 
     }
