@@ -21,6 +21,7 @@
 
 #include "h264_stream.h"
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -72,6 +73,8 @@ int main(int argc, char *argv[])
 
     int opt_verbose = 1;
     int opt_probe = 0;
+    int arge = 0;
+    bool write = false;
 
 #ifdef HAVE_GETOPT_LONG
     int c;
@@ -100,14 +103,57 @@ int main(int argc, char *argv[])
         }
     }
 
-    infile = fopen(argv[optind], "rb");
+    arge += optind;
 
 #else
 
-    infile = fopen(argv[1], "rb");
+    arge += 1;
 
 #endif
 
+    infile = fopen(argv[arge], "rb");
+    arge += 1;
+
+    if (infile == NULL && argc > arge)
+    {
+        sei_t* seis;
+        sei_t sei;
+        sei_unregistered_user_data_t uud;
+        nal_t nal;
+        for (int i = 0; i < 16; i++)
+        {
+            uud.uuid[i] = 'A' + i;
+        }
+        uud.user_data = (uint8_t*)argv[arge];
+        nal.nal_unit_type = NAL_UNIT_TYPE_SEI;
+        nal.nal_ref_idc = 0;
+        sei.payloadType = SEI_TYPE_USER_DATA_UNREGISTERED;
+        sei.payloadSize = strlen( argv[arge] ) + 16;
+        sei.sei_uud = &uud;
+        seis = &sei;
+        h->seis = &seis;
+        h->sei = &sei;
+        h->nal = &nal;
+        h->num_seis = 1;
+        int len = write_nal_unit(h, buf, BUFSIZE);
+        write = true;
+        infile = fopen(argv[arge - 1], "wb");
+        fwrite("\0", sizeof(char), 1, infile);
+        fwrite("\0", sizeof(char), 1, infile);
+        fwrite("\0", sizeof(char), 1, infile);
+        fwrite("\1", sizeof(char), 1, infile);
+        buf = buf + 1;
+        for (int i = 0; i < len; i++)
+        {
+            fwrite(&(buf[i]), sizeof(uint8_t), 1, infile);
+        }
+        fwrite("\0", sizeof(char), 1, infile);
+        fwrite("\0", sizeof(char), 1, infile);
+        fwrite("\0", sizeof(char), 1, infile);
+        fwrite("\1", sizeof(char), 1, infile);
+        fclose(infile);
+        exit(EXIT_SUCCESS);
+    }
     if (infile == NULL) { fprintf( stderr, "!! Error: could not open file: %s \n", strerror(errno)); exit(EXIT_FAILURE); }
 
     if (h264_dbgfile == NULL) { h264_dbgfile = stdout; }

@@ -43,6 +43,8 @@ set(ADDITIONALS
 	h264_slice_data.h
 )
 
+add_definitions(-DHAVE_SEI=1)
+
 add_library(h264bitstream ${SOURCES} ${HEADERS})
 target_sources(h264bitstream
 	PUBLIC FILE_SET headers TYPE HEADERS FILES ${HEADERS}

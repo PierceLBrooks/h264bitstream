@@ -265,6 +265,21 @@ void structure(sei_display_orientation)( h264_stream_t* h, bs_t* b )
 
 }
 
+void structure(sei_unregistered_user_data)( h264_stream_t* h, bs_t* b )
+{
+    sei_unregistered_user_data_t* sei_uud = h->sei->sei_uud;
+
+    for( int i = 0; i <= 16; i++ )
+    {
+        value( sei_uud->uuid[i], u8 );
+    }
+    for( int i = 0; i <= h->sei->payloadSize - 16; i++ )
+    {
+        value( sei_uud->user_data[i], u8 );
+    }
+
+}
+
 // D.1 SEI payload syntax
 void structure(sei_payload)( h264_stream_t* h, bs_t* b )
 {
@@ -286,6 +301,13 @@ void structure(sei_payload)( h264_stream_t* h, bs_t* b )
                 s->sei_do = (sei_display_orientation_t*)calloc( 1, sizeof(sei_display_orientation_t) );
             }
             structure(sei_display_orientation)( h, b );
+            break;
+        case SEI_TYPE_USER_DATA_UNREGISTERED:
+            if( is_reading )
+            {
+                s->sei_uud = (sei_unregistered_user_data_t*)calloc( 1, sizeof(sei_unregistered_user_data_t) );
+            }
+            structure(sei_unregistered_user_data)( h, b );
             break;
         default:
             if( is_reading )
