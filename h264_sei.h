@@ -145,6 +145,12 @@ typedef struct
 
 typedef struct
 {
+    unsigned char uuid[16];
+    uint8_t* user_data;
+} sei_unregistered_user_data_t;
+
+typedef struct
+{
     int payloadType;
     int payloadSize;
     
@@ -152,6 +158,7 @@ typedef struct
     {
         sei_scalability_info_t* sei_svc;
         sei_display_orientation_t* sei_do;
+        sei_unregistered_user_data_t* sei_uud;
         uint8_t* data;
     };
 } sei_t;

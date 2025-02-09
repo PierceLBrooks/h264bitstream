@@ -73,6 +73,7 @@ void read_sei_end_bits(h264_stream_t* h, bs_t* b )
 
 void read_sei_scalability_info( h264_stream_t* h, bs_t* b );
 void read_sei_display_orientation( h264_stream_t* h, bs_t* b );
+void read_sei_unregistered_user_data( h264_stream_t* h, bs_t* b );
 void read_sei_payload( h264_stream_t* h, bs_t* b );
 
 
@@ -268,6 +269,21 @@ void read_sei_display_orientation( h264_stream_t* h, bs_t* b )
 
 }
 
+void read_sei_unregistered_user_data( h264_stream_t* h, bs_t* b )
+{
+    sei_unregistered_user_data_t* sei_uud = h->sei->sei_uud;
+
+    for( int i = 0; i <= 16; i++ )
+    {
+        sei_uud->uuid[i] = bs_read_u8(b);
+    }
+    for( int i = 0; i <= h->sei->payloadSize - 16; i++ )
+    {
+        sei_uud->user_data[i] = bs_read_u8(b);
+    }
+
+}
+
 // D.1 SEI payload syntax
 void read_sei_payload( h264_stream_t* h, bs_t* b )
 {
@@ -290,6 +306,13 @@ void read_sei_payload( h264_stream_t* h, bs_t* b )
             }
             read_sei_display_orientation( h, b );
             break;
+        case SEI_TYPE_USER_DATA_UNREGISTERED:
+            if( 1 )
+            {
+                s->sei_uud = (sei_unregistered_user_data_t*)calloc( 1, sizeof(sei_unregistered_user_data_t) );
+            }
+            read_sei_unregistered_user_data( h, b );
+            break;
         default:
             if( 1 )
             {
@@ -309,6 +332,7 @@ void read_sei_payload( h264_stream_t* h, bs_t* b )
 
 void write_sei_scalability_info( h264_stream_t* h, bs_t* b );
 void write_sei_display_orientation( h264_stream_t* h, bs_t* b );
+void write_sei_unregistered_user_data( h264_stream_t* h, bs_t* b );
 void write_sei_payload( h264_stream_t* h, bs_t* b );
 
 
@@ -504,6 +528,21 @@ void write_sei_display_orientation( h264_stream_t* h, bs_t* b )
 
 }
 
+void write_sei_unregistered_user_data( h264_stream_t* h, bs_t* b )
+{
+    sei_unregistered_user_data_t* sei_uud = h->sei->sei_uud;
+
+    for( int i = 0; i <= 16; i++ )
+    {
+        bs_write_u8(b, sei_uud->uuid[i]);
+    }
+    for( int i = 0; i <= h->sei->payloadSize - 16; i++ )
+    {
+        bs_write_u8(b, sei_uud->user_data[i]);
+    }
+
+}
+
 // D.1 SEI payload syntax
 void write_sei_payload( h264_stream_t* h, bs_t* b )
 {
@@ -526,6 +565,13 @@ void write_sei_payload( h264_stream_t* h, bs_t* b )
             }
             write_sei_display_orientation( h, b );
             break;
+        case SEI_TYPE_USER_DATA_UNREGISTERED:
+            if( 0 )
+            {
+                s->sei_uud = (sei_unregistered_user_data_t*)calloc( 1, sizeof(sei_unregistered_user_data_t) );
+            }
+            write_sei_unregistered_user_data( h, b );
+            break;
         default:
             if( 0 )
             {
@@ -545,6 +591,7 @@ void write_sei_payload( h264_stream_t* h, bs_t* b )
 
 void read_debug_sei_scalability_info( h264_stream_t* h, bs_t* b );
 void read_debug_sei_display_orientation( h264_stream_t* h, bs_t* b );
+void read_debug_sei_unregistered_user_data( h264_stream_t* h, bs_t* b );
 void read_debug_sei_payload( h264_stream_t* h, bs_t* b );
 
 
@@ -740,6 +787,21 @@ void read_debug_sei_display_orientation( h264_stream_t* h, bs_t* b )
 
 }
 
+void read_debug_sei_unregistered_user_data( h264_stream_t* h, bs_t* b )
+{
+    sei_unregistered_user_data_t* sei_uud = h->sei->sei_uud;
+
+    for( int i = 0; i <= 16; i++ )
+    {
+        printf("%ld.%d: ", (long int)(b->p - b->start), b->bits_left); sei_uud->uuid[i] = bs_read_u8(b); printf("sei_uud->uuid[i]: %d \n", sei_uud->uuid[i]); 
+    }
+    for( int i = 0; i <= h->sei->payloadSize - 16; i++ )
+    {
+        printf("%ld.%d: ", (long int)(b->p - b->start), b->bits_left); sei_uud->user_data[i] = bs_read_u8(b); printf("sei_uud->user_data[i]: %d \n", sei_uud->user_data[i]); 
+    }
+
+}
+
 // D.1 SEI payload syntax
 void read_debug_sei_payload( h264_stream_t* h, bs_t* b )
 {
@@ -761,6 +823,13 @@ void read_debug_sei_payload( h264_stream_t* h, bs_t* b )
                 s->sei_do = (sei_display_orientation_t*)calloc( 1, sizeof(sei_display_orientation_t) );
             }
             read_debug_sei_display_orientation( h, b );
+            break;
+        case SEI_TYPE_USER_DATA_UNREGISTERED:
+            if( 1 )
+            {
+                s->sei_uud = (sei_unregistered_user_data_t*)calloc( 1, sizeof(sei_unregistered_user_data_t) );
+            }
+            read_debug_sei_unregistered_user_data( h, b );
             break;
         default:
             if( 1 )
