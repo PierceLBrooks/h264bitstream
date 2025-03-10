@@ -27,6 +27,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <math.h>
+
+#ifndef MIN
+#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
+#endif
+#ifndef MAX
+#define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
+#endif
 
 #define BUFSIZE 32*1024*1024
 
@@ -61,6 +69,15 @@ void usage( )
     fprintf( stderr, "h264_analyze [options] <input bitstream>\noptions:\n%s\n", options);
 }
 
+void* memdup(const void* mem, size_t size) { 
+   void* out = malloc(size);
+
+   if(out != NULL)
+       memcpy(out, mem, size);
+
+   return out;
+}
+
 int main(int argc, char *argv[])
 {
     FILE* infile;
@@ -74,7 +91,6 @@ int main(int argc, char *argv[])
     int opt_verbose = 1;
     int opt_probe = 0;
     int arge = 0;
-    bool write = false;
 
 #ifdef HAVE_GETOPT_LONG
     int c;
@@ -116,27 +132,45 @@ int main(int argc, char *argv[])
 
     if (infile == NULL && argc > arge)
     {
+        const char* uuid = "0xDEADACABA11A71"; // 30784445-4144-4143-4142-413131413731
         sei_t* seis;
         sei_t sei;
         sei_unregistered_user_data_t uud;
         nal_t nal;
-        for (int i = 0; i < 16; i++)
+        for (int i = 0; i < MIN(sizeof(uud.uuid), strlen(uuid)); i++)
         {
-            uud.uuid[i] = 'A' + i;
+            uud.uuid[i] = uuid[i];
         }
-        uud.user_data = (uint8_t*)argv[arge];
         nal.nal_unit_type = NAL_UNIT_TYPE_SEI;
         nal.nal_ref_idc = 0;
         sei.payloadType = SEI_TYPE_USER_DATA_UNREGISTERED;
-        sei.payloadSize = strlen( argv[arge] ) + 16;
+        infile = fopen(argv[arge], "rb");
+        int len = strlen( argv[arge] );
+        if (infile != NULL)
+        {
+            len = fread(buf, 1, BUFSIZE, infile);
+            if (len > 0)
+            {
+                uud.user_data = (uint8_t*)memdup(buf, len);
+            }
+            else
+            {
+                len = strlen( argv[arge] );
+                uud.user_data = (uint8_t*)strdup(argv[arge]);
+            }
+        }
+        else
+        {
+            uud.user_data = (uint8_t*)strdup(argv[arge]);
+        }
+        sei.payloadSize = len + sizeof(uud.uuid);
         sei.sei_uud = &uud;
         seis = &sei;
         h->seis = &seis;
         h->sei = &sei;
         h->nal = &nal;
         h->num_seis = 1;
-        int len = write_nal_unit(h, buf, BUFSIZE);
-        write = true;
+        len = write_nal_unit(h, buf, BUFSIZE);
         infile = fopen(argv[arge - 1], "wb");
         fwrite("\0", sizeof(char), 1, infile);
         fwrite("\0", sizeof(char), 1, infile);
