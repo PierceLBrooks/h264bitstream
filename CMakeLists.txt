@@ -47,6 +47,7 @@ add_definitions(-DHAVE_SEI=1)
 
 add_library(h264bitstream ${SOURCES} ${HEADERS})
 target_compile_features(h264bitstream PRIVATE c_std_11)
+set_target_properties(h264bitstream PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_sources(h264bitstream
 	PUBLIC FILE_SET headers TYPE HEADERS FILES ${HEADERS}
 )
