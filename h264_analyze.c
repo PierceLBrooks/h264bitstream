@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
         sei_t sei;
         sei_unregistered_user_data_t uud;
         nal_t nal;
-        for (int i = 0; i < MIN(sizeof(uud.uuid), strlen(uuid)); i++)
+        for (int i = 0; i < (int)MIN(sizeof(uud.uuid), strlen(uuid)); i++)
         {
             uud.uuid[i] = uuid[i];
         }
