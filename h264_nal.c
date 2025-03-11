@@ -73,53 +73,61 @@ h264_stream_t* h264_new()
  */
 void h264_free(h264_stream_t* h)
 {
-    free(h->nal->nal_svc_ext);
-    free(h->nal->prefix_nal_svc);
-    free(h->nal);
-
-    for ( int i = 0; i < 32; i++ ) { free( h->sps_table[i] ); }
-    for ( int i = 0; i < 64; i++ )
+    if (h != NULL)
     {
-        if( h->sps_subset_table[i]->sps != NULL )
-            free( h->sps_subset_table[i]->sps );
-        if( h->sps_subset_table[i]->sps_svc_ext != NULL )
-            free( h->sps_subset_table[i]->sps_svc_ext );
-        free( h->sps_subset_table[i] );
-    }
-    for ( int i = 0; i < 256; i++ ) { free( h->pps_table[i] ); }
-
-    free(h->pps);
-    free(h->aud);
-    if(h->seis != NULL)
-    {
-        for( int i = 0; i < h->num_seis; i++ )
+        if (h->nal != NULL)
         {
-            sei_t* sei = h->seis[i];
-            sei_free(sei);
-        }
-        free(h->seis);
-    }
-    free(h->sh);
-    
-    if (h->sh_svc_ext != NULL) free(h->sh_svc_ext);
-
-    if (h->slice_data != NULL)
-    {
-        if (h->slice_data->rbsp_buf != NULL)
-        {
-            free(h->slice_data->rbsp_buf);
+            if (h->nal->nal_svc_ext != NULL) { free( h->nal->nal_svc_ext ); }
+            if (h->nal->prefix_nal_svc != NULL) { free( h->nal->prefix_nal_svc ); }
+            free( h->nal );
         }
 
-        free(h->slice_data);
+        for ( int i = 0; i < 256; i++ ) { if (h->pps_table[i] != NULL) { free( h->pps_table[i] ); } }
+        for ( int i = 0; i < 32; i++ ) { if (h->sps_table[i] != NULL) { free( h->sps_table[i] ); } }
+        for ( int i = 0; i < 64; i++ )
+        {
+            if (h->sps_subset_table[i] == NULL) continue;
+            if (h->sps_subset_table[i]->sps != NULL) { free( h->sps_subset_table[i]->sps ); }
+            if (h->sps_subset_table[i]->sps_svc_ext != NULL) { free( h->sps_subset_table[i]->sps_svc_ext ); }
+            free( h->sps_subset_table[i] );
+        }
+
+        if (h->sh != NULL) { free( h->sh ); }
+        if (h->sh_svc_ext != NULL) { free( h->sh_svc_ext ); }
+        if (h->pps != NULL) { free( h->pps ); }
+        if (h->aud != NULL) { free( h->aud ); }
+
+        if (h->seis != NULL)
+        {
+            for ( int i = 0; i < h->num_seis; i++ )
+            {
+                sei_t* sei = h->seis[i];
+                if (sei != NULL) { sei_free( sei ); }
+            }
+            free( h->seis );
+        }
+
+        if (h->slice_data != NULL)
+        {
+            if (h->slice_data->rbsp_buf != NULL)
+            {
+                free( h->slice_data->rbsp_buf );
+            }
+
+            free( h->slice_data );
+        }
+
+        if (h->sps != NULL) { free( h->sps ); }
+
+        if (h->sps_subset != NULL)
+        {
+            if (h->sps_subset->sps != NULL) { free( h->sps_subset->sps ); }
+            if (h->sps_subset->sps_svc_ext != NULL) { free( h->sps_subset->sps_svc_ext ); }
+            free( h->sps_subset );
+        }
+
+        free( h );
     }
-
-    free(h->sps);
-
-    free(h->sps_subset->sps);
-    free(h->sps_subset->sps_svc_ext);
-    free(h->sps_subset);
-
-    free(h);
 }
 
 /**
