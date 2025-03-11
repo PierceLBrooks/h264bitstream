@@ -46,15 +46,18 @@ set(ADDITIONALS
 add_definitions(-DHAVE_SEI=1)
 
 add_library(h264bitstream ${SOURCES} ${HEADERS})
+target_compile_features(h264bitstream PRIVATE c_std_11)
 target_sources(h264bitstream
 	PUBLIC FILE_SET headers TYPE HEADERS FILES ${HEADERS}
 )
 target_link_libraries(h264bitstream PRIVATE compile_options)
 
 add_executable(h264_analyze h264_analyze.c)
+target_compile_features(h264_analyze PRIVATE c_std_11)
 target_link_libraries(h264_analyze PRIVATE compile_options h264bitstream)
 
 add_executable(svc_split svc_split.c)
+target_compile_features(svc_split PRIVATE c_std_11)
 target_link_libraries(svc_split PRIVATE compile_options h264bitstream)
 
 install(TARGETS h264bitstream h264_analyze svc_split
