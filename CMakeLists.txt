@@ -24,6 +24,7 @@ endif()
 
 # Library sources
 set(SOURCES
+	h264_avcc.c
 	h264_nal.c
 	h264_sei.c
 	h264_stream.c
@@ -38,7 +39,6 @@ set(HEADERS
 
 # These do not participate in build -- for now...
 set(ADDITIONALS
-	h264_avcc.c
 	h264_slice_data.c
 	h264_slice_data.h
 )
