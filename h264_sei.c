@@ -306,41 +306,45 @@ void read_sei_unregistered_user_data( h264_stream_t* h, bs_t* b )
 // D.1 SEI payload syntax
 void read_sei_payload( h264_stream_t* h, bs_t* b )
 {
-    sei_t* s = h->sei;
+    sei_t* sei = h->sei;
     
     int i;
-    switch( s->payloadType )
+    if( 1 )
+    {
+        printf("sei->payloadType: %i\n", (int)sei->payloadType);
+    }
+    switch( sei->payloadType )
     {
         case SEI_TYPE_SCALABILITY_INFO:
             if( 1 )
             {
-                s->sei_svc = (sei_scalability_info_t*)calloc( 1, sizeof(sei_scalability_info_t) );
+                sei->sei_svc = (sei_scalability_info_t*)calloc( 1, sizeof(sei_scalability_info_t) );
             }
             read_sei_scalability_info( h, b );
             break;
         case SEI_TYPE_DISPLAY_ORIENTATION:
             if( 1 )
             {
-                s->sei_do = (sei_display_orientation_t*)calloc( 1, sizeof(sei_display_orientation_t) );
+                sei->sei_do = (sei_display_orientation_t*)calloc( 1, sizeof(sei_display_orientation_t) );
             }
             read_sei_display_orientation( h, b );
             break;
         case SEI_TYPE_USER_DATA_UNREGISTERED:
             if( 1 )
             {
-                s->sei_uud = (sei_unregistered_user_data_t*)calloc( 1, sizeof(sei_unregistered_user_data_t) );
+                sei->sei_uud = (sei_unregistered_user_data_t*)calloc( 1, sizeof(sei_unregistered_user_data_t) );
             }
             read_sei_unregistered_user_data( h, b );
             break;
         default:
             if( 1 )
             {
-                s->data = (uint8_t*)calloc(1, s->payloadSize);
+                sei->data = (uint8_t*)calloc(1, sei->payloadSize);
             }
             
-            for ( i = 0; i < s->payloadSize; i++ )
+            for ( i = 0; i < sei->payloadSize; i++ )
             {
-                s->data[i] = bs_read_u8(b);
+                sei->data[i] = bs_read_u8(b);
             }
     }
     
@@ -569,41 +573,45 @@ void write_sei_unregistered_user_data( h264_stream_t* h, bs_t* b )
 // D.1 SEI payload syntax
 void write_sei_payload( h264_stream_t* h, bs_t* b )
 {
-    sei_t* s = h->sei;
+    sei_t* sei = h->sei;
     
     int i;
-    switch( s->payloadType )
+    if( 0 )
+    {
+        printf("sei->payloadType: %i\n", (int)sei->payloadType);
+    }
+    switch( sei->payloadType )
     {
         case SEI_TYPE_SCALABILITY_INFO:
             if( 0 )
             {
-                s->sei_svc = (sei_scalability_info_t*)calloc( 1, sizeof(sei_scalability_info_t) );
+                sei->sei_svc = (sei_scalability_info_t*)calloc( 1, sizeof(sei_scalability_info_t) );
             }
             write_sei_scalability_info( h, b );
             break;
         case SEI_TYPE_DISPLAY_ORIENTATION:
             if( 0 )
             {
-                s->sei_do = (sei_display_orientation_t*)calloc( 1, sizeof(sei_display_orientation_t) );
+                sei->sei_do = (sei_display_orientation_t*)calloc( 1, sizeof(sei_display_orientation_t) );
             }
             write_sei_display_orientation( h, b );
             break;
         case SEI_TYPE_USER_DATA_UNREGISTERED:
             if( 0 )
             {
-                s->sei_uud = (sei_unregistered_user_data_t*)calloc( 1, sizeof(sei_unregistered_user_data_t) );
+                sei->sei_uud = (sei_unregistered_user_data_t*)calloc( 1, sizeof(sei_unregistered_user_data_t) );
             }
             write_sei_unregistered_user_data( h, b );
             break;
         default:
             if( 0 )
             {
-                s->data = (uint8_t*)calloc(1, s->payloadSize);
+                sei->data = (uint8_t*)calloc(1, sei->payloadSize);
             }
             
-            for ( i = 0; i < s->payloadSize; i++ )
+            for ( i = 0; i < sei->payloadSize; i++ )
             {
-                bs_write_u8(b, s->data[i]);
+                bs_write_u8(b, sei->data[i]);
             }
     }
     
@@ -832,41 +840,45 @@ void read_debug_sei_unregistered_user_data( h264_stream_t* h, bs_t* b )
 // D.1 SEI payload syntax
 void read_debug_sei_payload( h264_stream_t* h, bs_t* b )
 {
-    sei_t* s = h->sei;
+    sei_t* sei = h->sei;
     
     int i;
-    switch( s->payloadType )
+    if( 1 )
+    {
+        printf("sei->payloadType: %i\n", (int)sei->payloadType);
+    }
+    switch( sei->payloadType )
     {
         case SEI_TYPE_SCALABILITY_INFO:
             if( 1 )
             {
-                s->sei_svc = (sei_scalability_info_t*)calloc( 1, sizeof(sei_scalability_info_t) );
+                sei->sei_svc = (sei_scalability_info_t*)calloc( 1, sizeof(sei_scalability_info_t) );
             }
             read_debug_sei_scalability_info( h, b );
             break;
         case SEI_TYPE_DISPLAY_ORIENTATION:
             if( 1 )
             {
-                s->sei_do = (sei_display_orientation_t*)calloc( 1, sizeof(sei_display_orientation_t) );
+                sei->sei_do = (sei_display_orientation_t*)calloc( 1, sizeof(sei_display_orientation_t) );
             }
             read_debug_sei_display_orientation( h, b );
             break;
         case SEI_TYPE_USER_DATA_UNREGISTERED:
             if( 1 )
             {
-                s->sei_uud = (sei_unregistered_user_data_t*)calloc( 1, sizeof(sei_unregistered_user_data_t) );
+                sei->sei_uud = (sei_unregistered_user_data_t*)calloc( 1, sizeof(sei_unregistered_user_data_t) );
             }
             read_debug_sei_unregistered_user_data( h, b );
             break;
         default:
             if( 1 )
             {
-                s->data = (uint8_t*)calloc(1, s->payloadSize);
+                sei->data = (uint8_t*)calloc(1, sei->payloadSize);
             }
             
-            for ( i = 0; i < s->payloadSize; i++ )
+            for ( i = 0; i < sei->payloadSize; i++ )
             {
-                printf("%ld.%d: ", (long int)(b->p - b->start), b->bits_left); s->data[i] = bs_read_u8(b); printf("s->data[i]: %d \n", s->data[i]); 
+                printf("%ld.%d: ", (long int)(b->p - b->start), b->bits_left); sei->data[i] = bs_read_u8(b); printf("sei->data[i]: %d \n", sei->data[i]); 
             }
     }
     

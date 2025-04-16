@@ -302,41 +302,45 @@ void structure(sei_unregistered_user_data)( h264_stream_t* h, bs_t* b )
 // D.1 SEI payload syntax
 void structure(sei_payload)( h264_stream_t* h, bs_t* b )
 {
-    sei_t* s = h->sei;
+    sei_t* sei = h->sei;
     
     int i;
-    switch( s->payloadType )
+    if( is_reading )
+    {
+        printf("sei->payloadType: %i\n", (int)sei->payloadType);
+    }
+    switch( sei->payloadType )
     {
         case SEI_TYPE_SCALABILITY_INFO:
             if( is_reading )
             {
-                s->sei_svc = (sei_scalability_info_t*)calloc( 1, sizeof(sei_scalability_info_t) );
+                sei->sei_svc = (sei_scalability_info_t*)calloc( 1, sizeof(sei_scalability_info_t) );
             }
             structure(sei_scalability_info)( h, b );
             break;
         case SEI_TYPE_DISPLAY_ORIENTATION:
             if( is_reading )
             {
-                s->sei_do = (sei_display_orientation_t*)calloc( 1, sizeof(sei_display_orientation_t) );
+                sei->sei_do = (sei_display_orientation_t*)calloc( 1, sizeof(sei_display_orientation_t) );
             }
             structure(sei_display_orientation)( h, b );
             break;
         case SEI_TYPE_USER_DATA_UNREGISTERED:
             if( is_reading )
             {
-                s->sei_uud = (sei_unregistered_user_data_t*)calloc( 1, sizeof(sei_unregistered_user_data_t) );
+                sei->sei_uud = (sei_unregistered_user_data_t*)calloc( 1, sizeof(sei_unregistered_user_data_t) );
             }
             structure(sei_unregistered_user_data)( h, b );
             break;
         default:
             if( is_reading )
             {
-                s->data = (uint8_t*)calloc(1, s->payloadSize);
+                sei->data = (uint8_t*)calloc(1, sei->payloadSize);
             }
             
-            for ( i = 0; i < s->payloadSize; i++ )
+            for ( i = 0; i < sei->payloadSize; i++ )
             {
-                value( s->data[i], u8 );
+                value( sei->data[i], u8 );
             }
     }
     
